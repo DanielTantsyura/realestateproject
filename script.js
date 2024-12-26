@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
         // Call backend
         try {
-          const response = await fetch('http://localhost:3001/api/ask', {
+          const response = await fetch('/api/ask', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
   
         try {
-            const response = await fetch('http://localhost:3001/api/create', {
+            const response = await fetch('/api/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentDocument = document.getElementById('documentText').value;
 
         try {
-            const response = await fetch('http://localhost:3001/api/update', {
+            const response = await fetch('/api/update', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

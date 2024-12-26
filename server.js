@@ -12,7 +12,11 @@ const __dirname = dirname(__filename);
 
 // Initialize Express
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://realestateproject-pqex.onrender.com/'  // Replace with your actual Render domain
+    : 'http://localhost:3001'
+}));
 app.use(express.json());
 
 // Serve static files from the root directory
