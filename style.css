@@ -1,9 +1,9 @@
 /* Base styles */
 body {
     font-family: Arial, sans-serif;
-    max-width: 800px;
     margin: 0;
     padding: 20px;
+    max-width: none;
 }
 
 /* Question styles */
@@ -65,4 +65,120 @@ body {
 
 .create-doc-button:active {
     background-color: #004080;
+}
+
+.container {
+    display: flex;
+    gap: 2rem;
+    margin: 20px;
+    width: calc(100% - 40px);
+}
+
+.left-panel {
+    flex: 1;
+    width: 50%;
+    padding-right: 1rem;
+}
+
+.right-panel {
+    flex: 1;
+    width: 50%;
+    padding-left: 1rem;
+}
+
+.followup-container {
+    margin-top: 20px;
+    display: none;
+}
+
+.followup-textarea {
+    width: 100%;
+    min-height: 100px;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#documentText {
+    width: 100%;
+    min-height: 200px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #f9f9f9;
+    font-family: inherit;
+    font-size: inherit;
+    resize: vertical;
+    box-sizing: border-box;
+    display: block;
+    height: 100%;
+}
+
+#documentContainer {
+    width: 100%;
+    min-height: 200px;
+    padding: 0;
+    margin: 0;
+}
+
+/* Add styles for required field indicators */
+.required-field {
+    color: red;
+    margin-left: 4px;
+}
+
+select.error {
+    border: 1px solid red;
+    background-color: #fff0f0;
+}
+
+/* Add styles for the error message */
+.error-message {
+    color: red;
+    text-align: center;
+    margin: 10px 0;
+    font-size: 0.9em;
+    display: none;
+}
+
+/* Add styles for the header */
+.header {
+    background-color: #f5f5f5;
+    padding: 20px;
+    text-align: center;
+    margin: -20px -20px 20px -20px;  /* Negative margin to stretch full width */
+    border-bottom: 1px solid #ddd;
+}
+
+.header h1 {
+    margin: 0;
+    color: #333;
+}
+
+/* Style the section titles consistently */
+.section-title {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Add error styling for the followup textarea */
+.followup-textarea.error {
+    border-color: #ff4444;
+    background-color: #fff0f0;
+}
+
+/* Add success state for buttons */
+.create-doc-button.success {
+    background-color: #28a745;
+}
+
+.create-doc-button.success:hover {
+    background-color: #218838;
+}
+
+/* Add this class for hiding elements */
+.hidden {
+    display: none;
 }

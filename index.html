@@ -8,45 +8,59 @@
     <script src="script.js"></script>
   </head>
   <body>
-    <h1>AI-Assisted Document Drafter</h1>
+    <div class="header">
+        <h1>AI-Assisted Document Drafter</h1>
+    </div>
     
-    <!-- Step 1: Basic inputs -->
-    <label for="state">State (required):</label>
-    <select id="state">
-      <option value="">-- Select a State --</option>
-      <!-- States will be populated via JavaScript -->
-    </select>
-    <br><br>
+    <div class="container">
+      <div class="left-panel">
+        <h2 class="section-title">Document Information</h2>
+        <!-- Step 1: Basic inputs -->
+        <label for="state">State<span class="required-field">*</span></label>
+        <select id="state">
+          <option value="">-- Select a State --</option>
+          <!-- States will be populated via JavaScript -->
+        </select>
+        <br><br>
 
-    <label for="county">County (optional):</label>
-    <input type="text" id="county" placeholder="Enter county name">
-    <br><br>
+        <label for="county">County (optional):</label>
+        <input type="text" id="county" placeholder="Enter county name">
+        <br><br>
 
-    <label for="documentCategory">Document Category (required):</label>
-    <select id="documentCategory">
-      <option value="">-- Select Document Category --</option>
-    </select>
-    <br><br>
+        <label for="documentCategory">Document Category<span class="required-field">*</span></label>
+        <select id="documentCategory">
+          <option value="">-- Select Document Category --</option>
+        </select>
+        <br><br>
 
-    <label for="documentType">Document Type (required):</label>
-    <select id="documentType">
-      <option value="">-- First Select a Category --</option>
-    </select>
-    <br><br>
+        <label for="documentType">Document Type<span class="required-field">*</span></label>
+        <select id="documentType">
+          <option value="">-- First Select a Category --</option>
+        </select>
+        <br><br>
 
-    <button id="createBtn" class="create-doc-button">Begin Document Creation</button>
+        <div id="validationError" class="error-message"></div>
+        <button id="createBtn" class="create-doc-button">Begin Document Creation</button>
 
-    <hr>
+        <hr>
 
-    <!-- Step 2: Container for AI's clarifying questions -->
-    <h2>Clarifying Questions</h2>
-    <div id="questionsContainer"></div>
-    <button id="answerBtn" style="display: none;" class="create-doc-button">Create Document</button>
+        <!-- Step 2: Container for AI's clarifying questions -->
+        <h2>Clarifying Questions</h2>
+        <div id="questionsContainer"></div>
+        <button id="answerBtn" class="create-doc-button hidden">Create Document</button>
+      </div>
 
-    <hr>
-
-    <!-- Step 3: Container for final document -->
-    <h2>Generated Document</h2>
-    <div id="documentContainer"></div>
+      <div class="right-panel">
+        <h2 class="section-title">Generated Document</h2>
+        <div id="documentContainer"></div>
+        
+        <div class="followup-container">
+          <h3>Would you like to change anything?</h3>
+          <textarea id="followupChanges" class="followup-textarea" 
+            placeholder="Describe the changes you'd like to make to the document..."></textarea>
+          <button id="updateBtn" class="create-doc-button">Update Document</button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

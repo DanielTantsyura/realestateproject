@@ -77,6 +77,35 @@ app.post('/api/create', async (req, res) => {
   }
 });
 
+// Add this new endpoint after your existing endpoints
+app.post('/api/update', async (req, res) => {
+  const { currentDocument, requestedChanges } = req.body;
+
+  const prompt = `Here is a document:
+${currentDocument}
+
+Please update this document according to these requested changes:
+${requestedChanges}
+
+Return only the updated document without any additional text or explanations.`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini-2024-07-18',
+      messages: [
+        { role: 'system', content: 'You are a helpful AI for generating legal documents.' },
+        { role: 'user', content: prompt },
+      ],
+    });
+    
+    const updatedDocument = completion.choices[0].message.content;
+    res.json({ document: updatedDocument });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error updating document' });
+  }
+});
+
 // Start server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
