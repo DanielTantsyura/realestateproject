@@ -16,6 +16,7 @@ const data = {
         { value: "renovations", label: "Renovations and Construction" },
         { value: "financing", label: "Financing and Mortgages" },
         { value: "development", label: "Real Estate Development" },
+        { value: "business-entities", label: "LLC and Partnership Documents" },
         { value: "specialized", label: "Other Specialized Real Estate Documents" }
     ],
     documentTypes: {
@@ -131,6 +132,32 @@ const data = {
             "Right of Way Agreements",
             "Restrictive Covenants",
             "Infrastructure Agreements"
+        ],
+        'business-entities': [
+            "LLC Operating Agreements",
+            "Partnership Agreements",
+            "Articles of Organization",
+            "Articles of Incorporation",
+            "Membership Interest Purchase Agreements",
+            "Buy-Sell Agreements",
+            "Member Withdrawal Agreements",
+            "Capital Contribution Agreements",
+            "Profit Sharing Agreements",
+            "Management Agreements",
+            "Voting Rights Agreements",
+            "Member Resolution Documents",
+            "Dissolution Agreements",
+            "Transfer of Membership Interest",
+            "Subscription Agreements",
+            "Private Placement Memorandums",
+            "Corporate Bylaws",
+            "Meeting Minutes",
+            "Shareholder Agreements",
+            "Joint Venture Agreements",
+            "Limited Partnership Agreements",
+            "General Partnership Agreements",
+            "Entity Conversion Documents",
+            "Merger and Acquisition Agreements"
         ],
         'specialized': [
             "Easement Agreements",
