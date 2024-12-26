@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const documentContainer = document.getElementById('documentContainer');
     const followupChanges = document.getElementById('followupChanges');
     const updateBtn = document.getElementById('updateBtn');
+    const templateInput = document.getElementById('templateDoc');
+    const templatePreview = document.querySelector('.template-preview');
+    let uploadedTemplate = null;
   
     // Populate states dropdown
     states.forEach(state => {
@@ -125,6 +128,39 @@ document.addEventListener('DOMContentLoaded', () => {
         resetButtonComplete(createBtn, 'Begin Document Creation');
     });
   
+    // Add this function after your helper functions
+    function handleFileUpload(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedTemplate = e.target.result;
+                // Show preview of first 200 characters
+                templatePreview.textContent = `Template loaded: ${uploadedTemplate.substring(0, 200)}...`;
+                templatePreview.style.display = 'block';
+                resolve(uploadedTemplate);
+            };
+            reader.onerror = () => reject(new Error('Error reading file'));
+            reader.readAsText(file);
+        });
+    }
+
+    // Add this event listener after your other initialization code
+    templateInput.addEventListener('change', async (e) => {
+        if (e.target.files.length > 0) {
+            try {
+                await handleFileUpload(e.target.files[0]);
+                // Reset states when new template is uploaded
+                questionsContainer.innerHTML = '';
+                documentContainer.innerHTML = '';
+                answerBtn.classList.add('hidden');
+                document.querySelector('.followup-container').style.display = 'none';
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                alert('Error uploading file');
+            }
+        }
+    });
+  
     // 2. Click "Create" -> Ask GPT for clarifying questions
     createBtn.addEventListener('click', async () => {
         if (!validateForm()) {
@@ -133,16 +169,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const originalText = setButtonLoading(createBtn, createBtn.textContent);
         
-        // Clear previous Qs/document and reset states
+        // Clear previous content and reset states
         questionsContainer.innerHTML = '';
         documentContainer.innerHTML = '';
         answerBtn.classList.add('hidden');
-        document.querySelector('.followup-container').style.display = 'none';  // Hide the followup section
+        document.querySelector('.followup-container').style.display = 'none';
         
-        // Reset other buttons to original state
-        resetButtonComplete(answerBtn, 'Create Document');
-        resetButtonComplete(updateBtn, 'Update Document');
-
         const state = stateSelect.value;
         const county = document.getElementById('county').value.trim();
         const selectedDocType = documentTypeSelect.value;
@@ -158,13 +190,16 @@ document.addEventListener('DOMContentLoaded', () => {
   
         // Call backend
         try {
-          const response = await fetch('/api/ask', {
+          // Choose endpoint based on whether template exists
+          const endpoint = uploadedTemplate ? '/api/ask-with-template' : '/api/ask';
+          const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
               state, 
               county, 
-              documentType: selectedDocType 
+              documentType: selectedDocType,
+              template: uploadedTemplate 
             }),
           });
           const data = await response.json();
@@ -328,7 +363,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     clarifyingQuestions: questions, 
-                    clarifyingAnswers 
+                    clarifyingAnswers,
+                    template: uploadedTemplate 
                 }),
             });
             const data = await response.json();

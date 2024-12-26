@@ -55,11 +55,13 @@ app.post('/api/ask', async (req, res) => {
 
 // Endpoint to get final document
 app.post('/api/create', async (req, res) => {
-  const { clarifyingQuestions, clarifyingAnswers } = req.body;
+  const { clarifyingQuestions, clarifyingAnswers, template } = req.body;
 
   // Construct the follow-up prompt
-  // We'll pass in the Q&A
-  let followUpPrompt = `Here are the answers to your questions. Please create the document now and return just the document. Do not include any other text:\n\n`;
+  let followUpPrompt = template 
+    ? `Here is the original template:\n\n${template}\n\nPlease modify this template according to these answers:\n\n`
+    : `Here are the answers to your questions. Please create the document now and return just the document:\n\n`;
+
   clarifyingQuestions.forEach((q, index) => {
     followUpPrompt += `${index + 1}. ${q}\nAnswer: ${clarifyingAnswers[index]}\n`;
   });
@@ -107,6 +109,44 @@ Return only the updated document without any additional text or explanations.`;
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error updating document' });
+  }
+});
+
+// Add this new endpoint after your existing endpoints
+app.post('/api/ask-with-template', async (req, res) => {
+  const { state, county, documentType, template } = req.body;
+
+  const prompt = `I have a ${documentType} template for use in ${state}${county ? `, ${county} county` : ''}. 
+    Here is the template:
+    
+    ${template}
+
+    Please analyze this template and ask me clarifying questions about what needs to be changed or filled in.
+    Focus on:
+    1. What specific information needs to be updated
+    2. Which sections might need modification
+    3. Any missing elements that should be added
+    4. Any jurisdiction-specific requirements that might be missing
+    
+    Format each question with a title and number like this:
+    1. **Field Update**: [Question about specific field]
+    2. **Section Review**: [Question about section changes]
+    etc.`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini-2024-07-18',
+      messages: [
+        { role: 'system', content: 'You are a helpful AI for analyzing and modifying legal documents.' },
+        { role: 'user', content: prompt },
+      ],
+    });
+    
+    const aiResponse = completion.choices[0].message.content;
+    res.json({ questions: aiResponse });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error generating template-based questions' });
   }
 });
 
