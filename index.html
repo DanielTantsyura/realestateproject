@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>AI-Assisted Document Drafter</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+  </head>
+  <body>
+    <h1>AI-Assisted Document Drafter</h1>
+    
+    <!-- Step 1: Basic inputs -->
+    <label for="state">State (required):</label>
+    <select id="state">
+      <option value="">-- Select a State --</option>
+      <!-- States will be populated via JavaScript -->
+    </select>
+    <br><br>
+
+    <label for="county">County (optional):</label>
+    <input type="text" id="county" placeholder="Enter county name">
+    <br><br>
+
+    <label for="documentCategory">Document Category (required):</label>
+    <select id="documentCategory">
+      <option value="">-- Select Document Category --</option>
+    </select>
+    <br><br>
+
+    <label for="documentType">Document Type (required):</label>
+    <select id="documentType">
+      <option value="">-- First Select a Category --</option>
+    </select>
+    <br><br>
+
+    <button id="createBtn" class="create-doc-button">Begin Document Creation</button>
+
+    <hr>
+
+    <!-- Step 2: Container for AI's clarifying questions -->
+    <h2>Clarifying Questions</h2>
+    <div id="questionsContainer"></div>
+    <button id="answerBtn" style="display: none;" class="create-doc-button">Create Document</button>
+
+    <hr>
+
+    <!-- Step 3: Container for final document -->
+    <h2>Generated Document</h2>
+    <div id="documentContainer"></div>
+  </body>
+</html>
