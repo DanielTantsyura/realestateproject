@@ -29,9 +29,9 @@ const openai = new OpenAI({
 
 // Endpoint to get clarifying questions
 app.post('/api/ask', async (req, res) => {
-  const { state, county, documentType } = req.body;
+  const { state, documentType } = req.body;
 
-  const prompt = `Write a ${documentType} for use in ${state}${county ? `, ${county} county` : ''}. 
+  const prompt = `Write a ${documentType} for use in ${state}. 
     It should follow standard legal templates and requirements for this jurisdiction.
     Before you write anything, please ask me any clarifying questions you need answered to create an appropriate document.`;
 
@@ -114,9 +114,9 @@ Return only the updated document without any additional text or explanations.`;
 
 // Add this new endpoint after your existing endpoints
 app.post('/api/ask-with-template', async (req, res) => {
-  const { state, county, documentType, template } = req.body;
+  const { state, documentType, template } = req.body;
 
-  const prompt = `I have a ${documentType} template for use in ${state}${county ? `, ${county} county` : ''}. 
+  const prompt = `I have a ${documentType} template for use in ${state}. 
     Here is the template:
     
     ${template}

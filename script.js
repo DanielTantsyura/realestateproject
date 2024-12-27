@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('validationError').style.display = 'none';
             }
         }
-        resetButtonComplete(createBtn, 'Begin Document Creation');
+        resetButtonComplete(createBtn, 'Next Step');
     });
 
     documentCategorySelect.addEventListener('change', () => {
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('validationError').style.display = 'none';
             }
         }
-        resetButtonComplete(createBtn, 'Begin Document Creation');
+        resetButtonComplete(createBtn, 'Next Step');
     });
 
     documentTypeSelect.addEventListener('change', () => {
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('validationError').style.display = 'none';
             }
         }
-        resetButtonComplete(createBtn, 'Begin Document Creation');
+        resetButtonComplete(createBtn, 'Next Step');
     });
   
     // Add this function after your helper functions
@@ -171,12 +171,18 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Clear previous content and reset states
         questionsContainer.innerHTML = '';
-        documentContainer.innerHTML = '';
+        document.querySelector('.placeholder-text').style.display = 'none';  // Hide the placeholder text
+        // Don't clear documentContainer anymore since we want to keep the textarea
         answerBtn.classList.add('hidden');
         document.querySelector('.followup-container').style.display = 'none';
         
+        // Clear the document textarea instead of the container
+        const documentTextarea = document.getElementById('documentText');
+        if (documentTextarea) {
+            documentTextarea.value = '';
+        }
+
         const state = stateSelect.value;
-        const county = document.getElementById('county').value.trim();
         const selectedDocType = documentTypeSelect.value;
   
         if (!state) {
@@ -197,7 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
               state, 
-              county, 
               documentType: selectedDocType,
               template: uploadedTemplate 
             }),
@@ -292,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
           console.error(error);
           alert('Error fetching clarifying questions');
-          resetButtonComplete(createBtn, 'Begin Document Creation');
+          resetButtonComplete(createBtn, 'Next Step');
         }
     });
   

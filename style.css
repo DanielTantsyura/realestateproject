@@ -72,18 +72,30 @@ body {
     gap: 2rem;
     margin: 20px;
     width: calc(100% - 40px);
+    position: relative;
+}
+
+.container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    background-color: #ddd;
+    transform: translateX(-50%);
 }
 
 .left-panel {
     flex: 1;
     width: 50%;
-    padding-right: 1rem;
+    padding-right: 2rem;
 }
 
 .right-panel {
     flex: 1;
     width: 50%;
-    padding-left: 1rem;
+    padding-left: 2rem;
 }
 
 .followup-container {
@@ -205,5 +217,18 @@ select.error {
 /* Add some styling for the placeholder text */
 #documentText::placeholder {
     color: #999;
+    font-style: italic;
+}
+
+/* Add this new class */
+.text-center {
+    text-align: center;
+}
+
+/* Add this for the placeholder text */
+.placeholder-text {
+    color: #666;
+    text-align: center;
+    margin: 20px 0;
     font-style: italic;
 }

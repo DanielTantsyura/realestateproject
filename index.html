@@ -2,29 +2,25 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>AI-Assisted Document Drafter</title>
+    <title>Real Estate Document Drafter</title>
     <link rel="stylesheet" href="style.css">
     <script src="data.js"></script>
     <script src="script.js"></script>
   </head>
   <body>
     <div class="header">
-        <h1>AI-Assisted Document Drafter</h1>
+        <h1>Real Estate Document Drafter</h1>
     </div>
     
     <div class="container">
       <div class="left-panel">
-        <h2 class="section-title">Document Information</h2>
+        <h2 class="section-title text-center">Create New Document</h2>
         <!-- Step 1: Basic inputs -->
-        <label for="state">State<span class="required-field">*</span></label>
+        <label for="state">State of Governance<span class="required-field">*</span></label>
         <select id="state">
           <option value="">-- Select a State --</option>
           <!-- States will be populated via JavaScript -->
         </select>
-        <br><br>
-
-        <label for="county">County (optional):</label>
-        <input type="text" id="county" placeholder="Enter county name">
         <br><br>
 
         <label for="documentCategory">Document Category<span class="required-field">*</span></label>
@@ -40,24 +36,25 @@
         <br><br>
 
         <div class="template-upload">
-          <label for="templateDoc">Upload Template Document (optional):</label>
+          <label for="templateDoc">Upload Reference Document (optional):</label>
           <input type="file" id="templateDoc" accept=".txt,.doc,.docx,.pdf">
           <div class="template-preview"></div>
         </div>
 
         <div id="validationError" class="error-message"></div>
-        <button id="createBtn" class="create-doc-button">Begin Document Creation</button>
+        <button id="createBtn" class="create-doc-button">Next Step</button>
 
         <hr>
 
         <!-- Step 2: Container for AI's clarifying questions -->
-        <h2>Clarifying Questions</h2>
+        <h2 class="section-title text-center">Clarifying Questions</h2>
+        <div class="placeholder-text">Clarifying questions will appear here when you start document generation</div>
         <div id="questionsContainer"></div>
-        <button id="answerBtn" class="create-doc-button hidden">Create Document</button>
+        <button id="answerBtn" class="create-doc-button hidden">Generate Document</button>
       </div>
 
       <div class="right-panel">
-        <h2 class="section-title">Document Editor</h2>
+        <h2 class="section-title text-center">Document Editor</h2>
         <div id="documentContainer">
           <textarea id="documentText" class="document-textarea" 
             placeholder="Your document will appear here. You can also paste or type your own document."></textarea>
@@ -66,7 +63,7 @@
         <div class="followup-container">
           <h3>Would you like to change anything?</h3>
           <textarea id="followupChanges" class="followup-textarea" 
-            placeholder="Describe the changes you'd like to make to the document..."></textarea>
+            placeholder="Describe the changes you'd like to make to the document above..."></textarea>
           <button id="updateBtn" class="create-doc-button">Update Document</button>
         </div>
       </div>
