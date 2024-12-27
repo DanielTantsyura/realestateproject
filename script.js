@@ -119,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         resetButtonComplete(createBtn, 'Next Step');
+        checkDropdownsComplete();
     });
 
     documentCategorySelect.addEventListener('change', () => {
@@ -129,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         resetButtonComplete(createBtn, 'Next Step');
+        checkDropdownsComplete();
     });
 
     documentTypeSelect.addEventListener('change', () => {
@@ -139,6 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         resetButtonComplete(createBtn, 'Next Step');
+        checkDropdownsComplete();
     });
   
     // Add this function after your helper functions
@@ -174,15 +177,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Reset the Next Step button
                 resetButtonComplete(createBtn, 'Next Step');
                 
+                createBtn.classList.add('ready');
             } catch (error) {
                 console.error('Error uploading file:', error);
                 alert('Error uploading file');
+                createBtn.classList.remove('ready');
             }
         } else {
             // Re-enable dropdowns if no file is selected
             [stateSelect, documentCategorySelect, documentTypeSelect].forEach(select => {
                 select.disabled = false;
             });
+            createBtn.classList.remove('ready');
         }
     });
   
@@ -456,6 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
             followupChanges.classList.remove('error');
         }
         resetButtonComplete(updateBtn, 'Update Document');
+        checkUpdateText();
     });
 
     // Add listener for answer textareas
@@ -463,6 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.answer-textarea').forEach(textarea => {
             textarea.addEventListener('input', () => {
                 resetButtonComplete(answerBtn, 'Generate Document');
+                checkAnswersComplete();
             });
         });
     }
@@ -495,5 +503,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Reset the Next Step button
         resetButtonComplete(createBtn, 'Next Step');
+        createBtn.classList.remove('ready');
+    });
+
+    // Add this function to check if all dropdowns are filled
+    function checkDropdownsComplete() {
+        const allFilled = stateSelect.value && 
+                         documentCategorySelect.value && 
+                         documentTypeSelect.value;
+        if (allFilled) {
+            createBtn.classList.add('ready');
+        } else {
+            createBtn.classList.remove('ready');
+        }
+    }
+
+    // Add this function to check if all questions are answered
+    function checkAnswersComplete() {
+        const allAnswered = Array.from(document.querySelectorAll('.answer-textarea'))
+            .every(textarea => textarea.value.trim() !== '');
+        if (allAnswered) {
+            answerBtn.classList.add('ready');
+        } else {
+            answerBtn.classList.remove('ready');
+        }
+    }
+
+    // Add this function to check if update text is entered
+    function checkUpdateText() {
+        if (followupChanges.value.trim()) {
+            updateBtn.classList.add('ready');
+        } else {
+            updateBtn.classList.remove('ready');
+        }
+    }
+
+    // Remove emphasis when buttons are clicked
+    createBtn.addEventListener('click', () => {
+        createBtn.classList.remove('ready');
+        // ... rest of click handler
+    });
+
+    answerBtn.addEventListener('click', () => {
+        answerBtn.classList.remove('ready');
+        // ... rest of click handler
+    });
+
+    updateBtn.addEventListener('click', () => {
+        updateBtn.classList.remove('ready');
+        // ... rest of click handler
     });
   });

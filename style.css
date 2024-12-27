@@ -135,11 +135,6 @@ body {
 }
 
 /* Add styles for required field indicators */
-.required-field {
-    color: red;
-    margin-left: 4px;
-}
-
 select.error {
     border: 1px solid red;
     background-color: #fff0f0;
@@ -323,4 +318,27 @@ select.error {
 
 .remove-file-btn:hover {
   background: #cc0000;
+}
+
+/* Add button emphasis styles */
+@keyframes buttonEmphasis {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 102, 204, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(0, 102, 204, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 102, 204, 0);
+    }
+}
+
+.create-doc-button.ready {
+    animation: buttonEmphasis 2s infinite;
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+.create-doc-button.ready:hover {
+    transform: scale(1.1);
 }
