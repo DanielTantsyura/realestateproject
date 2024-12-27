@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const followupChanges = document.getElementById('followupChanges');
     const updateBtn = document.getElementById('updateBtn');
     const templateInput = document.getElementById('templateDoc');
-    const templatePreview = document.querySelector('.template-preview');
     let uploadedTemplate = null;
+    const removeTemplateBtn = document.getElementById('removeTemplate');
   
     // Populate states dropdown
     states.forEach(state => {
@@ -69,14 +69,27 @@ document.addEventListener('DOMContentLoaded', () => {
   
     // Add validation function after your DOM element declarations
     function validateForm() {
+        const errorDiv = document.getElementById('validationError');
+        
+        // Check if using reference document (dropdowns are disabled)
+        if (stateSelect.disabled) {
+            // Verify that a document is uploaded
+            if (!uploadedTemplate) {
+                errorDiv.textContent = 'Please upload a reference document';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+            errorDiv.style.display = 'none';
+            return true;
+        }
+
+        // Otherwise validate all fields for generic template
         let isValid = true;
         const requiredFields = [
             { element: stateSelect, name: 'state' },
             { element: documentCategorySelect, name: 'document category' },
             { element: documentTypeSelect, name: 'document type' }
         ];
-
-        const errorDiv = document.getElementById('validationError');
         
         requiredFields.forEach(field => {
             if (!field.element.value) {
@@ -88,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (!isValid) {
-            errorDiv.textContent = 'Please select all required fields';
+            errorDiv.textContent = 'When using a generic template, please select all required fields';
             errorDiv.style.display = 'block';
         } else {
             errorDiv.style.display = 'none';
@@ -134,9 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 uploadedTemplate = e.target.result;
-                // Show preview of first 200 characters
-                templatePreview.textContent = `Template loaded: ${uploadedTemplate.substring(0, 200)}...`;
-                templatePreview.style.display = 'block';
+                removeTemplateBtn.classList.remove('hidden');
                 resolve(uploadedTemplate);
             };
             reader.onerror = () => reject(new Error('Error reading file'));
@@ -151,13 +162,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 await handleFileUpload(e.target.files[0]);
                 // Reset states when new template is uploaded
                 questionsContainer.innerHTML = '';
-                documentContainer.innerHTML = '';
+                document.querySelector('.placeholder-text').style.display = 'block';
                 answerBtn.classList.add('hidden');
-                document.querySelector('.followup-container').style.display = 'none';
+                
+                // Clear and disable the dropdowns
+                [stateSelect, documentCategorySelect, documentTypeSelect].forEach(select => {
+                    select.value = '';
+                    select.disabled = true;
+                });
+                
+                // Reset the Next Step button
+                resetButtonComplete(createBtn, 'Next Step');
+                
             } catch (error) {
                 console.error('Error uploading file:', error);
                 alert('Error uploading file');
             }
+        } else {
+            // Re-enable dropdowns if no file is selected
+            [stateSelect, documentCategorySelect, documentTypeSelect].forEach(select => {
+                select.disabled = false;
+            });
         }
     });
   
@@ -171,133 +196,122 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Clear previous content and reset states
         questionsContainer.innerHTML = '';
-        document.querySelector('.placeholder-text').style.display = 'none';  // Hide the placeholder text
-        // Don't clear documentContainer anymore since we want to keep the textarea
+        document.querySelector('.placeholder-text').style.display = 'none';
         answerBtn.classList.add('hidden');
-        document.querySelector('.followup-container').style.display = 'none';
         
-        // Clear the document textarea instead of the container
-        const documentTextarea = document.getElementById('documentText');
-        if (documentTextarea) {
-            documentTextarea.value = '';
-        }
+        // Hide the entire right panel content
+        document.getElementById('documentText').value = '';
+        document.getElementById('documentText').style.display = 'none';
+        document.querySelector('.followup-container').style.display = 'none';
 
-        const state = stateSelect.value;
-        const selectedDocType = documentTypeSelect.value;
-  
-        if (!state) {
-          alert('Please select a state');
-          return;
-        }
-        if (!selectedDocType) {
-          alert('Please select a document type');
-          return;
-        }
-  
+        // Get values based on whether we're using a template or not
+        const state = stateSelect.disabled ? 'Template' : stateSelect.value;
+        const selectedDocType = documentTypeSelect.disabled ? 'Reference Document' : documentTypeSelect.value;
+
         // Call backend
         try {
-          // Choose endpoint based on whether template exists
-          const endpoint = uploadedTemplate ? '/api/ask-with-template' : '/api/ask';
-          const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              state, 
-              documentType: selectedDocType,
-              template: uploadedTemplate 
-            }),
-          });
-          const data = await response.json();
-          if (data.error) {
-            alert(data.error);
-            return;
-          }
+            const endpoint = uploadedTemplate ? '/api/ask-with-template' : '/api/ask';
+            console.log(`Calling API: ${endpoint}`);
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    state, 
+                    documentType: selectedDocType,
+                    template: uploadedTemplate 
+                }),
+            });
+            const data = await response.json();
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
   
-          // Parse questions with titles and content
-          const lines = data.questions.split('\n');
-          const questions = [];
-          let currentQuestion = null;
+            // Parse questions with titles and content
+            const lines = data.questions.split('\n');
+            const questions = [];
+            let currentQuestion = null;
 
-          lines.forEach(line => {
-              // Match lines that start with a number followed by. **title**:
-              const titleMatch = line.match(/^(\d+)\.\s*\*\*(.*?)\*\*:\s*(.*)/);
-              if (titleMatch) {
-                  if (currentQuestion) {
-                      questions.push(currentQuestion);
-                  }
-                  currentQuestion = {
-                      number: titleMatch[1],
-                      title: titleMatch[2],
-                      content: titleMatch[3]
-                  };
-              } else if (currentQuestion && line.trim()) {
-                  // Append non-empty lines to the current question's content
-                  currentQuestion.content += ' ' + line.trim();
-              }
-          });
-          
-          // Don't forget to push the last question
-          if (currentQuestion) {
-              questions.push(currentQuestion);
-          }
+            lines.forEach(line => {
+                // Match lines that start with a number followed by. **title**:
+                const titleMatch = line.match(/^(\d+)\.\s*\*\*(.*?)\*\*:\s*(.*)/);
+                if (titleMatch) {
+                    if (currentQuestion) {
+                        questions.push(currentQuestion);
+                    }
+                    currentQuestion = {
+                        number: titleMatch[1],
+                        title: titleMatch[2],
+                        content: titleMatch[3]
+                    };
+                } else if (currentQuestion && line.trim()) {
+                    // Append non-empty lines to the current question's content
+                    currentQuestion.content += ' ' + line.trim();
+                }
+            });
+            
+            // Don't forget to push the last question
+            if (currentQuestion) {
+                questions.push(currentQuestion);
+            }
 
-          // If only one question is returned, retry by triggering button click again
-          if (questions.length <= 1) {
-              console.log('Only one or 0 question returned, retrying...');
-              createBtn.click();
-              return;
-          }
+            // If only one question is returned, retry by triggering button click again
+            if (questions.length <= 1) {
+                console.log('Only one or 0 question returned, retrying...');
+                createBtn.click();
+                return;
+            }
 
-          // Display clarifying questions with formatted titles and larger text areas
-          questions.forEach((q, idx) => {
-              const questionDiv = document.createElement('div');
-              questionDiv.className = 'question-container';
+            // Display clarifying questions with formatted titles and larger text areas
+            questions.forEach((q, idx) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-container';
 
-              // Create title
-              const titleDiv = document.createElement('div');
-              titleDiv.className = 'question-title';
-              titleDiv.innerHTML = `${q.number}. ${q.title}`;
-              questionDiv.appendChild(titleDiv);
+                // Create title
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'question-title';
+                titleDiv.innerHTML = `${q.number}. ${q.title}`;
+                questionDiv.appendChild(titleDiv);
 
-              // Create content
-              const contentDiv = document.createElement('div');
-              contentDiv.className = 'question-content';
-              contentDiv.textContent = q.content;
-              questionDiv.appendChild(contentDiv);
+                // Create content
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'question-content';
+                contentDiv.textContent = q.content;
+                questionDiv.appendChild(contentDiv);
 
-              // Create textarea
-              const textarea = document.createElement('textarea');
-              textarea.id = `answerInput${idx}`;
-              textarea.rows = 4;
-              textarea.className = 'answer-textarea empty';
-              textarea.placeholder = 'Enter your answer here...';
+                // Create textarea
+                const textarea = document.createElement('textarea');
+                textarea.id = `answerInput${idx}`;
+                textarea.rows = 4;
+                textarea.className = 'answer-textarea empty';
+                textarea.placeholder = 'Enter your answer here...';
 
-              // Add event listeners for highlighting empty fields
-              textarea.addEventListener('input', () => {
-                  if (textarea.value.trim()) {
-                      textarea.classList.remove('empty');
-                  } else {
-                      textarea.classList.add('empty');
-                  }
-              });
+                // Add event listeners for highlighting empty fields
+                textarea.addEventListener('input', () => {
+                    if (textarea.value.trim()) {
+                        textarea.classList.remove('empty');
+                    } else {
+                        textarea.classList.add('empty');
+                    }
+                });
 
-              questionDiv.appendChild(textarea);
-              questionsContainer.appendChild(questionDiv);
-              questionsContainer.appendChild(document.createElement('br'));
-          });
+                questionDiv.appendChild(textarea);
+                questionsContainer.appendChild(questionDiv);
+                questionsContainer.appendChild(document.createElement('br'));
+            });
 
-          // Show "Go" button
-          answerBtn.classList.remove('hidden');
-          // Store questions array with the new structure
-          answerBtn.dataset.questions = JSON.stringify(questions.map(q => `${q.number}. ${q.title}: ${q.content}`));
+            // Show "Go" button
+            answerBtn.classList.remove('hidden');
+            // Store questions array with the new structure
+            answerBtn.dataset.questions = JSON.stringify(questions.map(q => `${q.number}. ${q.title}: ${q.content}`));
   
-          setButtonSuccess(createBtn);
-          setupAnswerTextareaListeners();
+            setButtonSuccess(createBtn);
+            setupAnswerTextareaListeners();
   
         } catch (error) {
-          console.error(error);
-          alert('Error fetching clarifying questions');
-          resetButtonComplete(createBtn, 'Next Step');
+            console.error(error);
+            alert('Error fetching clarifying questions');
+            resetButtonComplete(createBtn, 'Next Step');
         }
     });
   
@@ -346,10 +360,10 @@ document.addEventListener('DOMContentLoaded', () => {
     answerBtn.addEventListener('click', async () => {
         const originalText = setButtonLoading(answerBtn, answerBtn.textContent);
         
-        // Show followup section
+        // Show the document editor and followup section
+        document.getElementById('documentText').style.display = 'block';
         document.querySelector('.followup-container').style.display = 'block';
-        resetButtonComplete(updateBtn, 'Update Document');  // Reset update button state
-
+        
         const questions = JSON.parse(answerBtn.dataset.questions);
         const clarifyingAnswers = [];
 
@@ -360,6 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         try {
+            console.log('Calling API: /api/create');
             const response = await fetch('/api/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -385,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error(error);
             alert('Error generating final document');
-            resetButtonComplete(answerBtn, 'Create Document');
+            resetButtonComplete(answerBtn, 'Generate Document');
         }
     });
   
@@ -404,6 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentDocument = document.getElementById('documentText').value;
 
         try {
+            console.log('Calling API: /api/update');
             const response = await fetch('/api/update', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -446,7 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupAnswerTextareaListeners() {
         document.querySelectorAll('.answer-textarea').forEach(textarea => {
             textarea.addEventListener('input', () => {
-                resetButtonComplete(answerBtn, 'Create Document');
+                resetButtonComplete(answerBtn, 'Generate Document');
             });
         });
     }
@@ -463,5 +479,21 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             adjustTextareaHeight(documentTextarea);
         }, 0);
+    });
+
+    // Add remove template handler
+    removeTemplateBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        uploadedTemplate = null;
+        templateInput.value = '';
+        removeTemplateBtn.classList.add('hidden');
+        
+        // Re-enable dropdowns
+        [stateSelect, documentCategorySelect, documentTypeSelect].forEach(select => {
+            select.disabled = false;
+        });
+
+        // Reset the Next Step button
+        resetButtonComplete(createBtn, 'Next Step');
     });
   });

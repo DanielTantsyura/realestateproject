@@ -202,18 +202,6 @@ select.error {
     border-radius: 4px;
 }
 
-.template-preview {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #f5f5f5;
-    border-radius: 4px;
-    font-size: 0.9em;
-    display: none;
-    white-space: pre-wrap;
-    max-height: 100px;
-    overflow-y: auto;
-}
-
 /* Add some styling for the placeholder text */
 #documentText::placeholder {
     color: #999;
@@ -231,4 +219,108 @@ select.error {
     text-align: center;
     margin: 20px 0;
     font-style: italic;
+}
+
+/* Add styles for the disclaimer */
+.disclaimer {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-top: 1px solid #ddd;
+    color: #666;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+.disclaimer p {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.disclaimer strong {
+    color: #333;
+}
+
+/* Creation options styling */
+.creation-options {
+  margin: 20px 0;
+}
+
+.option-container {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  background-color: #fff;
+}
+
+.option-container h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.2em;
+}
+
+.option-description {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 0.9em;
+}
+
+.option-divider {
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+.option-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #ddd;
+}
+
+.option-divider span {
+  background-color: #fff;
+  padding: 0 10px;
+  color: #666;
+  position: relative;
+  font-weight: bold;
+}
+
+/* Modify template upload styling */
+.template-upload {
+  margin: 0;
+  padding: 15px;
+  background-color: #f8f8f8;
+}
+
+.file-input-container {
+  position: relative;
+  display: inline-block;
+}
+
+.remove-file-btn {
+  position: absolute;
+  right: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+}
+
+.remove-file-btn:hover {
+  background: #cc0000;
 }
