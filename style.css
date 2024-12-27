@@ -88,7 +88,7 @@ body {
 
 .followup-container {
     margin-top: 20px;
-    display: none;
+    display: block;
 }
 
 .followup-textarea {
@@ -106,13 +106,13 @@ body {
     padding: 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    background: #f9f9f9;
+    background: #fff;
     font-family: inherit;
     font-size: inherit;
     resize: vertical;
     box-sizing: border-box;
     display: block;
-    height: 100%;
+    margin-bottom: 20px;
 }
 
 #documentContainer {
@@ -200,4 +200,10 @@ select.error {
     white-space: pre-wrap;
     max-height: 100px;
     overflow-y: auto;
+}
+
+/* Add some styling for the placeholder text */
+#documentText::placeholder {
+    color: #999;
+    font-style: italic;
 }

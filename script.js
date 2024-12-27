@@ -236,13 +236,11 @@ document.addEventListener('DOMContentLoaded', () => {
               questions.push(currentQuestion);
           }
 
-          // If no structured questions found, fallback to entire text
-          if (questions.length === 0) {
-              questions.push({
-                  number: '1',
-                  title: 'Question',
-                  content: data.questions
-              });
+          // If only one question is returned, retry by triggering button click again
+          if (questions.length <= 1) {
+              console.log('Only one or 0 question returned, retrying...');
+              createBtn.click();
+              return;
           }
 
           // Display clarifying questions with formatted titles and larger text areas
@@ -343,20 +341,19 @@ document.addEventListener('DOMContentLoaded', () => {
     answerBtn.addEventListener('click', async () => {
         const originalText = setButtonLoading(answerBtn, answerBtn.textContent);
         
-        // Clear previous doc and hide followup section
-        documentContainer.innerHTML = '';
-        document.querySelector('.followup-container').style.display = 'none';
+        // Show followup section
+        document.querySelector('.followup-container').style.display = 'block';
         resetButtonComplete(updateBtn, 'Update Document');  // Reset update button state
 
         const questions = JSON.parse(answerBtn.dataset.questions);
         const clarifyingAnswers = [];
-  
+
         // Loop over the input fields to get user answers
         questions.forEach((q, idx) => {
             const answerVal = document.getElementById(`answerInput${idx}`).value;
             clarifyingAnswers.push(answerVal);
         });
-  
+
         try {
             const response = await fetch('/api/create', {
                 method: 'POST',
@@ -372,24 +369,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(data.error);
                 return;
             }
-  
-            // data.document is the final doc
-            documentContainer.innerHTML = ''; // Clear previous content
 
-            const documentTextarea = document.createElement('textarea');
-            documentTextarea.id = 'documentText';
-            documentTextarea.className = 'document-textarea';
+            // Update the existing textarea with the new document
+            const documentTextarea = document.getElementById('documentText');
             documentTextarea.value = data.document;
-            documentContainer.appendChild(documentTextarea);
-            
-            // Add this line after appending the textarea
             adjustTextareaHeight(documentTextarea);
-            
-            // Show the followup section
-            document.querySelector('.followup-container').style.display = 'block';
 
             setButtonSuccess(answerBtn);
-  
+
         } catch (error) {
             console.error(error);
             alert('Error generating final document');
@@ -458,4 +445,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // Add event listener for the document textarea to adjust height on input
+    const documentTextarea = document.getElementById('documentText');
+    documentTextarea.addEventListener('input', () => {
+        adjustTextareaHeight(documentTextarea);
+    });
+
+    // Also adjust height on paste events
+    documentTextarea.addEventListener('paste', () => {
+        // Use setTimeout to let the paste complete before adjusting
+        setTimeout(() => {
+            adjustTextareaHeight(documentTextarea);
+        }, 0);
+    });
   });
